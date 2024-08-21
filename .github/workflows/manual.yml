@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'Name'
+        required: true
+      password:
+        description: 'Password'
+        required: true
+
+jobs:
+  authenticate_and_push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Authenticate
+        run: |
+          INPUT_HASH=$(echo -n "${{ github.event.inputs.username }}:${{ github.event.inputs.password }}" | sha256sum | awk '{print $1}')
+          IFS=',' read -ra HASHES <<< "${{ secrets.HASHED_CREDENTIALS }}"
+          AUTHENTICATED="false"
+          for HASH in "${HASHES[@]}"; do
+            IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
+            if [[ "${{ github.event.inputs.username }}" == "$USERNAME" && "$INPUT_HASH" == "$HASHED_PASS" ]]; then
+              AUTHENTICATED="true"
+              break
+            fi
+          done
+
+          if [[ "$AUTHENTICATED" == "true" ]]; then
+            echo "Authentication successful."
+          else
+            echo "Authentication failed."
+            exit 1
+          fi
+
+      - name: Push files from Inputs
+        uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+          GH_USERNAME: 'Osiris-B'
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          DESTINATION_REPO_NAME: 'workflow-test-2'
+        with:
+          source-directory: 'Inputs'
+          destination-github-username: 'Osiris-B'
+          destination-repository-name: 'workflow-test-2'
+          user-email: ${{ secrets.USER_EMAIL }}
+          commit-message: 'Manually dispatched push from ${{ github.repository }}'
+          target-branch: 'main'
+          target-directory: 'Inputs'
+          
+      - name: Push files from Outputs
+        uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
+          GH_USERNAME: 'Osiris-B'
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          DESTINATION_REPO_NAME: 'workflow-test-2'
+        with:
+          source-directory: 'Outputs'
+          destination-github-username: 'Osiris-B'
+          destination-repository-name: 'workflow-test-2'
+          user-email: ${{ secrets.USER_EMAIL }}
+          commit-message: 'Manually dispatched push from ${{ github.repository }}'
+          target-branch: 'main'
+          target-directory: 'Outputs'
+
+      
+      
