@@ -21,7 +21,7 @@ jobs:
         run: |
           INPUT_HASH=$(echo -n "${{ github.event.inputs.username }}:${{ github.event.inputs.password }}" | sha256sum | awk '{print $1}')
           echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
-          IFS=',' read -ra HASHES <<< "${{ secrets.HASHED_CREDENTIALS }}"
+          IFS=',' read -ra HASHES <<< "${{ secrets.HASH_CREDENTIALS }}"
           AUTHENTICATED="false"
           echo "Hashes: $HASHES"
           for HASH in "${HASHES[@]}"; do
