@@ -40,37 +40,14 @@ jobs:
             exit 1
           fi
 
-      - name: Push files from Inputs
-        uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
-        env:
-          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
-          GH_USERNAME: 'Osiris-B'
-          USER_EMAIL: ${{ secrets.USER_EMAIL }}
-          DESTINATION_REPO_NAME: 'workflow-test-2'
+      - name: Push files to production
+        uses: repo-sync/github-sync@v2
         with:
-          source-directory: 'Inputs'
-          destination-github-username: 'Osiris-B'
-          destination-repository-name: 'workflow-test-2'
-          user-email: ${{ secrets.USER_EMAIL }}
-          commit-message: 'Manually dispatched push from ${{ github.repository }}'
-          target-branch: 'main'
-          target-directory: 'Inputs'
-          
-      - name: Push files from Outputs
-        uses: cpina/github-action-push-to-another-repository@ssh-deploy-key
-        env:
-          SSH_DEPLOY_KEY: ${{ secrets.SSH_DEPLOY_KEY }}
-          GH_USERNAME: 'Osiris-B'
-          USER_EMAIL: ${{ secrets.USER_EMAIL }}
-          DESTINATION_REPO_NAME: 'workflow-test-2'
-        with:
-          source-directory: 'Outputs'
-          destination-github-username: 'Osiris-B'
-          destination-repository-name: 'workflow-test-2'
-          user-email: ${{ secrets.USER_EMAIL }}
-          commit-message: 'Manually dispatched push from ${{ github.repository }}'
-          target-branch: 'main'
-          target-directory: 'Outputs'
+          source_repo: "https://github.com/${{ github.repository }}"
+          source_branch: "main"
+          destination_repo: "https://github.com/Osiris-B/workflow-test-2.git"
+          destination_branch: "main"
+          github_token: ${{ secrets.API_TOKEN_GITHUB }}
 
       
       
