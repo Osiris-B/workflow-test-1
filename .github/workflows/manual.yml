@@ -39,16 +39,15 @@ jobs:
             exit 1
           fi
             
-      - name: Set up Git with GitHub Token
+      - name: Set up Git with PAT
         run: |
           git config --global user.name "${{ github.actor }}"
           git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git config --global --add safe.directory '*'
-          git remote set-url origin https://x-access-token:${{ secrets.API_TOKEN_GITHUB }}@github.com/${{ github.repository }}
-
+          git remote set-url origin https://x-access-token:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git
+      
       - name: Push changes to target repository
         run: |
-          git remote set-url origin https://x-access-token:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git
           git add -A
           git commit -m "Automated commit from GitHub Actions" || echo "No changes to commit"
           git push origin main --verbose
+
