@@ -23,6 +23,7 @@ jobs:
           echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
           IFS=',' read -ra HASHES <<< "${{ secrets.HASHED_CREDENTIALS }}"
           AUTHENTICATED="false"
+          echo "Hashes: $HASHES"
           for HASH in "${HASHES[@]}"; do
             IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
             echo "Checking against stored hash for $USERNAME"  # Debug: Show which user is being checked
