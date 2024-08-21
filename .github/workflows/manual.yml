@@ -23,7 +23,6 @@ jobs:
           echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
           IFS=',' read -ra HASHES <<< "${{ secrets.HASH_CREDENTIALS }}"
           AUTHENTICATED="false"
-          echo "Hashes: $HASHES"
           for HASH in "${HASHES[@]}"; do
             IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
             echo "Checking against stored hash for $USERNAME"  # Debug: Show which user is being checked
@@ -40,14 +39,13 @@ jobs:
             exit 1
           fi
 
-      - name: Push files to production
-        uses: repo-sync/github-sync@v2
-        with:
-          source_repo: "https://github.com/${{ github.repository }}"
-          source_branch: "main"
-          destination_repo: "https://github.com/Osiris-B/workflow-test-2.git"
-          destination_branch: "main"
-          github_token: ${{ secrets.API_TOKEN_GITHUB }}
+      - name: Set up git with GitHub Token
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+          git config --global --add safe.directory '*'
+          git remote set-url origin https://x-access-token:${{ secrets.API_TOKEN_GITHUB }}@github.com/${{ github.repository }}
 
-      
-      
+      - name: Push files to production
+        run: |
+          git push https://x-access-token:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git main:main
