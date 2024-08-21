@@ -20,16 +20,18 @@ jobs:
       - name: Authenticate
         run: |
           INPUT_HASH=$(echo -n "${{ github.event.inputs.username }}:${{ github.event.inputs.password }}" | sha256sum | awk '{print $1}')
+          echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
           IFS=',' read -ra HASHES <<< "${{ secrets.HASHED_CREDENTIALS }}"
           AUTHENTICATED="false"
           for HASH in "${HASHES[@]}"; do
             IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
+            echo "Checking against stored hash for $USERNAME"  # Debug: Show which user is being checked
             if [[ "${{ github.event.inputs.username }}" == "$USERNAME" && "$INPUT_HASH" == "$HASHED_PASS" ]]; then
               AUTHENTICATED="true"
               break
             fi
           done
-
+      
           if [[ "$AUTHENTICATED" == "true" ]]; then
             echo "Authentication successful."
           else
