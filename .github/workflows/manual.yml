@@ -47,8 +47,9 @@ jobs:
       run: |
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
         chmod 600 id_rsa
-        eval $(ssh-agent -s)
+        eval "$(ssh-agent -s)"
         ssh-add id_rsa
+        mkdir -p ~/.ssh  # Ensure the .ssh directory exists
         ssh-keyscan github.com >> ~/.ssh/known_hosts
 
     - name: Push to Main Branch of Prod Fork
