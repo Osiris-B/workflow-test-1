@@ -1,9 +1,6 @@
 name: Push to Production Fork
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
     inputs:
       username:
