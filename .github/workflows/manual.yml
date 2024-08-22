@@ -41,21 +41,26 @@ jobs:
             
       - name: Push inputs.txt to target repository
         uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: 'Inputs/inputs.txt'
+          source_file: 'inputs.txt'
           destination_repo: 'Osiris-B/workflow-test-2'
           destination_folder: 'Inputs'
-          commit_message: 'Add inputs.txt'
-          target_branch: 'main'
-          github_token: ${{ secrets.API_TOKEN_GITHUB }}
+          user_email: 'boltzmannbrain1303@gmail.com'
+          user_name: 'Osiris-B'
+          commit_message: 'Updated inputs.txt'
+  
 
-      - name: Push output.txt to target repository
+      - name: Push outputs.txt to target repository
         uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: 'Outputs/output.txt'
+          source_file: 'outputs.txt'
           destination_repo: 'Osiris-B/workflow-test-2'
           destination_folder: 'Outputs'
-          commit_message: 'Add output.txt'
-          target_branch: 'main'
-          github_token: ${{ secrets.API_TOKEN_GITHUB }}
+          user_email: 'boltzmannbrain1303@gmail.com'
+          user_name: 'Osiris-B'
+          commit_message: 'Updated outputs.txt'
 
