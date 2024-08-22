@@ -43,5 +43,7 @@ jobs:
 
     - name: Push to Production Repo Main Branch
       run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "<>"
         git remote add production-fork https://$GITHUB_ACTOR:${{ secrets.API_TOKEN_2 }}@github.com/Osiris-B/workflow-test-2.git
         git push -f production-fork main:main
