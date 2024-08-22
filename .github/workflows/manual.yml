@@ -39,15 +39,23 @@ jobs:
             exit 1
           fi
             
-      - name: Set up Git with PAT
-        run: |
-          git config --global user.name "${{ github.actor }}"
-          git config --global user.email "${{ github.actor }}@users.noreply.github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git
-      
-      - name: Push changes to target repository
-        run: |
-          git add -A
-          git commit -m "Automated commit from GitHub Actions" || echo "No changes to commit"
-          git push origin main --verbose
+      - name: Push inputs.txt to target repository
+        uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
+        with:
+          source_file: 'Inputs/inputs.txt'
+          destination_repo: 'Osiris-B/workflow-test-2'
+          destination_folder: 'Inputs'
+          commit_message: 'Add inputs.txt'
+          target_branch: 'main'
+          github_token: ${{ secrets.API_TOKEN_GITHUB }}
+
+      - name: Push output.txt to target repository
+        uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
+        with:
+          source_file: 'Outputs/output.txt'
+          destination_repo: 'Osiris-B/workflow-test-2'
+          destination_folder: 'Outputs'
+          commit_message: 'Add output.txt'
+          target_branch: 'main'
+          github_token: ${{ secrets.API_TOKEN_GITHUB }}
 
