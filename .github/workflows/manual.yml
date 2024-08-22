@@ -1,4 +1,4 @@
-name: CI
+name: Push to Production Fork
 
 on:
   workflow_dispatch:
@@ -13,54 +13,38 @@ on:
 jobs:
   authenticate_and_push:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout Dev Repo Main Branch
+      uses: actions/checkout@v3
+      with:
+        ref: main  # Ensures that the main branch of the dev repo is checked out
 
-      - name: Authenticate
-        run: |
-          INPUT_HASH=$(echo -n "${{ github.event.inputs.username }}:${{ github.event.inputs.password }}" | sha256sum | awk '{print $1}')
-          echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
-          IFS=',' read -ra HASHES <<< "${{ secrets.HASH_CREDENTIALS }}"
-          AUTHENTICATED="false"
-          for HASH in "${HASHES[@]}"; do
-            IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
-            echo "Checking against stored hash for $USERNAME"  # Debug: Show which user is being checked
-            if [[ "${{ github.event.inputs.username }}" == "$USERNAME" && "$INPUT_HASH" == "$HASHED_PASS" ]]; then
-              AUTHENTICATED="true"
-              break
-            fi
-          done
-      
-          if [[ "$AUTHENTICATED" == "true" ]]; then
-            echo "Authentication successful."
-          else
-            echo "Authentication failed."
-            exit 1
+    - name: Authenticate
+      run: |
+        INPUT_HASH=$(echo -n "${{ github.event.inputs.username }}:${{ github.event.inputs.password }}" | sha256sum | awk '{print $1}')
+        echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
+        IFS=',' read -ra HASHES <<< "${{ secrets.HASH_CREDENTIALS }}"
+        AUTHENTICATED="false"
+        for HASH in "${HASHES[@]}"; do
+          IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
+          echo "Checking against stored hash for $USERNAME"  # Debug: Show which user is being checked
+          if [[ "${{ github.event.inputs.username }}" == "$USERNAME" && "$INPUT_HASH" == "$HASHED_PASS" ]]; then
+            AUTHENTICATED="true"
+            break
           fi
-            
-      - name: Push inputs.txt to target repository
-        uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source_file: 'Inputs/inputs.txt'
-          destination_repo: 'Osiris-B/workflow-test-2'
-          destination_folder: 'Inputs'
-          user_email: 'boltzmannbrain1303@gmail.com'
-          user_name: 'Osiris-B'
-          commit_message: 'Updated inputs.txt'
-  
+        done
 
-      - name: Push outputs.txt to target repository
-        uses: dmnemec/copy_file_to_another_repo_action@v1.1.1
-        env:
-          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
-        with:
-          source_file: 'Outputs/outputs.txt'
-          destination_repo: 'Osiris-B/workflow-test-2'
-          destination_folder: 'Outputs'
-          user_email: 'boltzmannbrain1303@gmail.com'
-          user_name: 'Osiris-B'
-          commit_message: 'Updated outputs.txt'
+        if [[ "$AUTHENTICATED" == "true" ]]; then
+          echo "Authentication successful."
+        else
+          echo "Authentication failed."
+          exit 1
+        fi
 
+    - name: Push to Main Branch of Prod Fork
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git remote add production-fork https://github.com/Osiris-B/workflow-test-2.git
+        git push -f production-fork main:main
