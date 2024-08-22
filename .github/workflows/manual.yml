@@ -46,5 +46,5 @@ jobs:
       env:
         PAT_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
       run: |
-        git remote add production-fork https://Osiris-B:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git
+        git remote add production-fork https://$GITHUB_ACTOR:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git
         git push -f production-fork main:main
