@@ -44,7 +44,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: 'inputs.txt'
+          source_file: 'Inputs/inputs.txt'
           destination_repo: 'Osiris-B/workflow-test-2'
           destination_folder: 'Inputs'
           user_email: 'boltzmannbrain1303@gmail.com'
@@ -57,7 +57,7 @@ jobs:
         env:
           API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
         with:
-          source_file: 'outputs.txt'
+          source_file: 'Outputs/outputs.txt'
           destination_repo: 'Osiris-B/workflow-test-2'
           destination_folder: 'Outputs'
           user_email: 'boltzmannbrain1303@gmail.com'
