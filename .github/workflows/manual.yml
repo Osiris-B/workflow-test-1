@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       username:
-        description: 'Name'
+        description: 'Username for authentication'
         required: true
       password:
-        description: 'Password'
+        description: 'Password for authentication'
         required: true
 
 jobs:
@@ -18,17 +18,17 @@ jobs:
     - name: Checkout Dev Repo Main Branch
       uses: actions/checkout@v3
       with:
-        ref: main  # Ensures that the main branch of the dev repo is checked out
+        ref: main
 
     - name: Authenticate
+      id: auth_step
       run: |
         INPUT_HASH=$(echo -n "${{ github.event.inputs.username }}:${{ github.event.inputs.password }}" | sha256sum | awk '{print $1}')
-        echo "Input Hash: $INPUT_HASH"  # Debug: Show the computed hash of the input
+        echo "Input Hash: $INPUT_HASH"
         IFS=',' read -ra HASHES <<< "${{ secrets.HASH_CREDENTIALS }}"
         AUTHENTICATED="false"
         for HASH in "${HASHES[@]}"; do
           IFS=':' read -r USERNAME HASHED_PASS <<< "$HASH"
-          echo "Checking against stored hash for $USERNAME"  # Debug: Show which user is being checked
           if [[ "${{ github.event.inputs.username }}" == "$USERNAME" && "$INPUT_HASH" == "$HASHED_PASS" ]]; then
             AUTHENTICATED="true"
             break
@@ -43,9 +43,7 @@ jobs:
         fi
 
     - name: Push to Main Branch of Prod Fork
-      env:
-        PAT_TOKEN: ${{ secrets.API_TOKEN_GITHUB }}
-        ACTIONS_RUNNER_DEBUG: true
+      if: success()
       run: |
         git remote add production-fork https://$GITHUB_ACTOR:${{ secrets.API_TOKEN_GITHUB }}@github.com/Osiris-B/workflow-test-2.git
         git push -f production-fork main:main
